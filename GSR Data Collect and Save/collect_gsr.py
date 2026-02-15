@@ -18,7 +18,7 @@ stop_flag = "stop"
 def main():
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") 
     
-
+# this runs the serialcup capture portion which gathers the data and saves to the .txt
     try:
         print("> Type 'start' to begin logging data and 'stop' to end")
         print("> Type CTRL+C to finish")
@@ -27,7 +27,7 @@ def main():
         print("\n All Done")
 
     results = []
-    
+# take data and then run the serialcup Query to save only data between start/stop markers
     def collect_data(line):
         if ',' in line:
             parts = line.split(',')
@@ -38,7 +38,7 @@ def main():
                     pass
 
     serialcup.query(str(data_path), serialNum, start_flag, stop_flag, collect_data)
-
+# take data, add reformated timestamp, save as CSV
     if results:
         csv_name = data_path / f"gsr_results_{timestamp}.csv"
 
