@@ -11,7 +11,7 @@ to use the python script, you must open it and adjust two things:
 
 **Note:** serialCup creates a new .txt file with the data gathered for every test you run. If you keep the file name of that txt as default, when you go to run it again serialcup will make a copy of that original file and then append your new data to it, which will result in erroneous data for the time period between when you finished the previous test and began the next. To avoid this, rename the .txt file after each test.  
 
-As of now I'm using a seperate matlab script to graph the csv data (not shared), but once I get around to learning how matplotlib works I'll use integrate that instead.
+As of now I'm using a seperate matlab script to graph the csv data (not shared), but once I get around to learning how matplotlib works I'll integrate that instead.
 
 
 
