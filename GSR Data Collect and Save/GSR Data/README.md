@@ -1,0 +1,1 @@
+This is just random test data from the GSR sensor, used in the creation of the analysis software. Don't consider any of this data to be especially accurate or useful for anything other than testing as it was gathered while also making adjustments to the sensor.
