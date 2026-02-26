@@ -18,7 +18,7 @@ class GSRConfig:
     arduino_reset_delay_s: float = 2.0
 
     # Smoothing
-    smooth_window: int = 50  # samples in moving average
+    smooth_window: int = 25  # samples in moving average
 
     # Buffering
     max_points: int = 60 * 50  # ~60 sec at ~50Hz (adjust later)

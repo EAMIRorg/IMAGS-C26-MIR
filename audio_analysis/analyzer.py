@@ -202,7 +202,7 @@ def analyze_audio_bytes(
             bpm = None
             bpm_method = "Unavailable"
 
-        return {                               '''ANALYSIS COMPLETE'''
+        return {                               
             "meta": {
                 "file_name": file_name,
                 "sample_rate": fs,
