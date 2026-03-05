@@ -21,7 +21,7 @@ class GSRConfig:
     smooth_window: int = 25  # samples in moving average
 
     # Buffering
-    max_points: int = 60 * 50  # ~60 sec at ~50Hz (adjust later)
+    max_points: int = 60 * 75  
 
 
 def list_serial_ports() -> List[Tuple[str, str]]:
@@ -116,7 +116,7 @@ class GSRStream:
 
                 self._smooth_buf.append(gsr)
                 smooth = float(np.mean(self._smooth_buf))
-                print(smooth)
+                #print(smooth)
                 now_ms = int(time.time() * 1000)
 
                 with self._lock:
