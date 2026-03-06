@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass 
-from typing import Dict, Any, Optional, Tuple
+from typing import Optional, Tuple, TypedDict
 
 import os
 import subprocess
@@ -12,7 +12,7 @@ import essentia.standard as es
 #################################################
 # Helpers/Utilities
 #################################################
-def _run_cmd(cmd: list) -> Tuple[int, str, str]:
+def _run_cmd(cmd: list[str]) -> Tuple[int, str, str]:
     """It does what it says on the box"""
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
@@ -60,20 +60,54 @@ def _safe_float(x) -> Optional[float]:
         return v
     except Exception:
         return None
-    
 
 
 @dataclass
 class AnalyzeOptions:
     sample_rate: int = 44100            # Standard sr
     smooth_points: int = 3              # 3 is good cause gives intricate rhythm indications without being too fuzzy (1 is too noisy)
-   
+
+
+#################################################
+# Analysis result types
+#################################################
+
+# region Analysis result types
+
+class AnalysisResultSeries(TypedDict):
+    t_sec: list[float]
+    momentary_lufs: list[float]
+    energy: list[float]
+
+class AnalysisResultMeta(TypedDict):
+    file_name: str
+    sample_rate: int
+    channels: int
+    duration_sec: float
+    smooth_points: int
+    energy_window_s: float
+    energy_hop_s: float
+    energy_smooth_s: float
+
+class AnalysisResultGlobals(TypedDict):
+    tempo_bpm: float | None
+    tempo_method: str
+    integrated_lufs: float | None
+    loudness_range_lu: float | None
+
+class AnalysisResult(TypedDict):
+    meta: AnalysisResultMeta
+    globals: AnalysisResultGlobals
+    series: AnalysisResultSeries
+
+# endregion
+
 
 def analyze_audio_bytes(
     file_bytes: bytes,
     file_name: str,
-    opts: Optional[AnalyzeOptions] = None,
-) -> Dict[str, Any]:
+    opts: AnalyzeOptions | None = None,
+) -> AnalysisResult:
     """
     Analyze an audio file (mp3/wav/etc as bytes) using Essentia.
     USE A WAV FILE FOR INPUT, OTHER FORMATS GET COMPRESSED AND QUIET 
@@ -213,8 +247,8 @@ def analyze_audio_bytes(
                 "energy_hop_s": float(energy_hop_s),
                 "energy_smooth_s": float(energy_smooth_s),
             },
-            "global": {
-                "tempo_bpm": bpm,                                   
+            "globals": {
+                "tempo_bpm": bpm,
                 "tempo_method": bpm_method,
                 "integrated_lufs": _safe_float(integrated),
                 "loudness_range_lu": _safe_float(loudness_range),

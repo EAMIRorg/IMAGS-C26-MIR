@@ -5,6 +5,9 @@ IMAGS-lite Streamlit App
 
 """
 
+from logging import basicConfig, DEBUG
+basicConfig(level=DEBUG)
+
 import time
 import json
 
@@ -15,7 +18,6 @@ from streamlit_autorefresh import st_autorefresh
 
 from audio_analysis.analyzer import analyze_audio_bytes, AnalyzeOptions
 from gsr.gsr_reader import GSRStream, GSRConfig, list_serial_ports
-
 
 # ------------------------------------------------------------
 # Streamlit config (must be the first Streamlit call)
