@@ -23,14 +23,15 @@ class GSRConfig:
     # Buffering
     max_points: int = 60 * 75  
 
+VIRTUAL_GSR = 'Virtual GSR'
 
-def list_serial_ports() -> List[Tuple[str, str]]:
+def list_serial_ports() -> list[tuple[str, str]]:
     """Return [(device, description), ...]."""
     ports = list(list_ports.comports())
-    return [(p.device, p.description) for p in ports]
+    return [(p.device, p.description) for p in ports] + [(VIRTUAL_GSR, 'Pseudo-random GSR simulator.')]
 
 
-def parse_line_to_float(line: str) -> Optional[float]:
+def parse_line_to_float(line: str) -> float | None:
     s = line.strip()
     if not s:
         return None

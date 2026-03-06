@@ -1,6 +1,6 @@
 import threading
 import time
-from typing import Optional, List, Tuple
+from typing import final
 from random import Random
 from collections import deque
 from math import floor, ceil
@@ -14,6 +14,7 @@ VIRTUAL_INTERVAL = 50 / 1000 # seconds
 def get_seconds():
     return datetime.now().timestamp()
 
+@final
 class Perlin:
     """ Implements a good-enough approximation of perlin noise for testing.  """
 
@@ -21,7 +22,7 @@ class Perlin:
         self.rng = Random()
         self.scale = scale
         self.sampleCount = sampleCount
-        self.buffer = list([self.rng.random() for x in range(sampleCount)])
+        self.buffer = list([self.rng.random() for _ in range(sampleCount)])
     
     def sample(self, x: float) -> float:
         x *= self.scale
@@ -36,6 +37,7 @@ class Perlin:
         x = x * x * x * (x * (6 * x - 15) + 10)
         return b * x + a * (1 - x)
 
+@final
 class GSRVirtualStream:
     """
     Background serial reader.
@@ -49,14 +51,14 @@ class GSRVirtualStream:
         self._thread: threading.Thread | None = None
 
         self._smooth_buf = deque[float](maxlen=self.cfg.smooth_window)
-        self._points = deque(maxlen=self.cfg.max_points)
+        self._points = deque[tuple[int, float]](maxlen=self.cfg.max_points)
         self._lock = threading.Lock()
 
         self._perlin_lg = Perlin(0.1, 32)
-        self._perlin_sm = Perlin(16.0)
+        self._perlin_sm = Perlin(8.0)
         self._time_start = 0.0
 
-        self._last_error: Optional[str] = None
+        self._last_error: str | None = None
 
     def start(self) -> None:
         if self._thread and self._thread.is_alive():
@@ -76,10 +78,10 @@ class GSRVirtualStream:
     def is_running(self) -> bool:
         return self._thread is not None and self._thread.is_alive()
 
-    def last_error(self) -> Optional[str]:
+    def last_error(self) -> str | None:
         return self._last_error
 
-    def get_points(self) -> List[Tuple[int, float]]:
+    def get_points(self) -> list[tuple[int, float]]:
         """Snapshot of all currently buffered points (pc_ms, gsr_smooth)."""
         with self._lock:
             return list(self._points)
@@ -97,7 +99,7 @@ class GSRVirtualStream:
                 time.sleep(VIRTUAL_INTERVAL)
                 
                 seconds = get_seconds() - self._time_start
-                gsr = 300.0 + self._perlin_lg.sample(seconds) * 50.0 + self._perlin_sm.sample(seconds) * 20.0;
+                gsr = 1.5 + self._perlin_lg.sample(seconds) * 2.0 + (self._perlin_sm.sample(seconds) * 1.0 - 0.5);
 
                 self._smooth_buf.append(gsr)
                 smooth = float(np.mean(self._smooth_buf))

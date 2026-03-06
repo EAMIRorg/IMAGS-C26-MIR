@@ -17,7 +17,8 @@ import altair as alt
 from streamlit_autorefresh import st_autorefresh
 
 from audio_analysis.analyzer import analyze_audio_bytes, AnalyzeOptions
-from gsr.gsr_reader import GSRStream, GSRConfig, list_serial_ports
+from gsr.gsr_reader import VIRTUAL_GSR, GSRStream, GSRConfig, list_serial_ports
+from gsr.gsr_faker import GSRVirtualStream
 
 # ------------------------------------------------------------
 # Streamlit config (must be the first Streamlit call)
@@ -88,7 +89,7 @@ def downsample_df(df: pd.DataFrame, max_points: int = 2500) -> pd.DataFrame:
     return df.iloc[::step].reset_index(drop=True)
 
 
-def make_energy_gsr_dual_axis_chart(energy_df: pd.DataFrame, gsr_df: pd.DataFrame) -> alt.Chart:
+def make_energy_gsr_dual_axis_chart(energy_df: pd.DataFrame, gsr_df: pd.DataFrame) -> alt.LayerChart:
     """
     Build a layered Altair chart with:
       - shared x-axis: t_sec (seconds)
@@ -241,7 +242,7 @@ if analyze_btn and uploaded is not None:
 if st.session_state.audio_res is not None:
     res = st.session_state.audio_res
     meta = res["meta"]
-    glob = res["global"]
+    glob = res["globals"]
 
     a, b, c, d = st.columns(4)
     tempo = glob.get("tempo_bpm")
@@ -309,7 +310,13 @@ if start_playback:
     # Adjust to 120 if you suspect very high sample rate.
     cfg = GSRConfig(max_points=int((duration + 10.0) * 80))
 
-    stream = GSRStream(st.session_state.gsr_port, cfg)
+    stream: GSRStream | GSRVirtualStream
+
+    if st.session_state.gsr_port == VIRTUAL_GSR:
+        stream = GSRVirtualStream(cfg)
+    else:
+        stream = GSRStream(st.session_state.gsr_port, cfg)
+
     stream.start()
 
     # Clear any pre-start buffered points so overlay begins clean at t=0
