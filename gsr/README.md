@@ -1,7 +1,7 @@
 GSR Data Collection Code:
 
 There are two parts to this:  
-**1.)** firmware for the arduino: `IMAGS_GSR.ino`
+**1.)** firmware for the arduino: `IMAGS_GSR.ino`  
 **2.)** Python script that uses SerialCup (https://github.com/sensortea/SerialCup) to read the data and save it as an csv  
 
 to use the python script, you must open it and adjust two things:  
