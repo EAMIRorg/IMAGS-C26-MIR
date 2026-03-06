@@ -10,13 +10,14 @@ from collections import deque
 from dataclasses import dataclass
 
 from pandas import DataFrame
-from threading import Thread, Lock, Event
+from threading import Thread, Lock
 
 from .player_stream import AudioPlayerStream
-from .analyzer import AnalysisResult, AnalysisResultSeries
+from .analyzer import AnalysisResult
 
 # --------------------------------------------------
 # Resampling/interpolation utilities
+# (!!!!!! THESE ARE CURRENTLY UNUSED !!!!!!)
 # --------------------------------------------------
 
 # region Sampling

@@ -1,10 +1,9 @@
-from __future__ import annotations
-
 import time
 import threading
+
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
 from collections import deque
+from typing import final
 
 import numpy as np
 import serial
@@ -43,25 +42,26 @@ def parse_line_to_float(line: str) -> float | None:
         return None
 
 
+@final
 class GSRStream:
     """
     Background serial reader.
     Stores smoothed samples as (pc_ms, gsr_smooth).
     """
 
-    def __init__(self, port: str, cfg: Optional[GSRConfig] = None):
+    def __init__(self, port: str, cfg: GSRConfig | None = None):
         self.port = port
         self.cfg = cfg or GSRConfig()
 
         self._stop = threading.Event()
-        self._thread: Optional[threading.Thread] = None
-        self._ser: Optional[serial.Serial] = None
+        self._thread: threading.Thread | None = None
+        self._ser: serial.Serial | None = None
 
-        self._smooth_buf = deque(maxlen=self.cfg.smooth_window)
-        self._points = deque(maxlen=self.cfg.max_points)
+        self._smooth_buf = deque[float](maxlen=self.cfg.smooth_window)
+        self._points = deque[tuple[int, float]](maxlen=self.cfg.max_points)
         self._lock = threading.Lock()
 
-        self._last_error: Optional[str] = None
+        self._last_error: str | None = None
 
     def start(self) -> None:
         if self._thread and self._thread.is_alive():
@@ -87,10 +87,10 @@ class GSRStream:
     def is_running(self) -> bool:
         return self._thread is not None and self._thread.is_alive()
 
-    def last_error(self) -> Optional[str]:
+    def last_error(self) -> str | None:
         return self._last_error
 
-    def get_points(self) -> List[Tuple[int, float]]:
+    def get_points(self) -> list[tuple[int, float]]:
         """Snapshot of all currently buffered points (pc_ms, gsr_smooth)."""
         with self._lock:
             return list(self._points)

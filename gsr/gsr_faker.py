@@ -1,10 +1,11 @@
-import threading
 import time
-from typing import final
-from random import Random
+import threading
+
 from collections import deque
+from random import Random
+from typing import final
+
 from math import floor, ceil
-from datetime import datetime
 from .gsr_reader import GSRConfig
 
 import numpy as np
@@ -12,7 +13,7 @@ import numpy as np
 VIRTUAL_INTERVAL = 50 / 1000 # seconds
 
 def get_seconds():
-    return datetime.now().timestamp()
+    return time.time()
 
 @final
 class Perlin:
